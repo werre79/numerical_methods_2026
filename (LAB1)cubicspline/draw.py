@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 def plot_spline_results():
-    # --- 1. Зчитування даних ---
+    # --- 1 Зчитування даних
     
     x_input = []
     y_input = []
