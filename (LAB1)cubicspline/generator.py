@@ -102,29 +102,46 @@ def build_spline(x_nodes, y_nodes, print_coeffs=False):
 x_smooth, y_smooth = build_spline(distances, elevations, print_coeffs=True)
 
 #Побудова графіків
-plt.figure(figsize=(12, 7))
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), gridspec_kw={'height_ratios': [2, 1]})
 
 idx_10 = np.linspace(0, n - 1, 10, dtype=int)
 x_10, y_10 = build_spline([distances[i] for i in idx_10], [elevations[i] for i in idx_10])
-plt.plot(x_10, y_10, 'g--', label="Сплайн (10 вузлів)")
+ax1.plot(x_10, y_10, 'g--', label="Сплайн (10 вузлів)")
 
 idx_15 = np.linspace(0, n - 1, 15, dtype=int)
 x_15, y_15 = build_spline([distances[i] for i in idx_15], [elevations[i] for i in idx_15])
-plt.plot(x_15, y_15, 'm-.', label="Сплайн (15 вузлів)")
+ax1.plot(x_15, y_15, 'm-.', label="Сплайн (15 вузлів)")
 
 idx_20 = np.linspace(0, n - 1, 20, dtype=int)
 x_20, y_20 = build_spline([distances[i] for i in idx_20], [elevations[i] for i in idx_20])
-plt.plot(x_20, y_20, 'b-', label="Сплайн (20 вузлів)")
+ax1.plot(x_20, y_20, 'b-', label="Сплайн (20 вузлів)")
 
-plt.plot(distances, elevations, 'ro', label="Реальні GPS вузли")
+ax1.plot(x_smooth, y_smooth, 'k:', label="Сплайн (21 вузол - ідеальний)", linewidth=2, alpha=0.5)
+ax1.plot(distances, elevations, 'ro', label="Реальні GPS вузли")
 
-plt.title("Профіль висоти: порівняння точності сплайнів")
-plt.xlabel("Кумулятивна відстань (м)")
-plt.ylabel("Висота (м)")
-plt.legend()
-plt.grid(True)
+ax1.set_title("Профіль висоти: порівняння точності сплайнів")
+ax1.set_ylabel("Висота (м)")
+ax1.legend()
+ax1.grid(True)
+
+# Графік похибок
+err_10 = np.abs(np.array(y_smooth) - np.array(y_10))
+err_15 = np.abs(np.array(y_smooth) - np.array(y_15))
+err_20 = np.abs(np.array(y_smooth) - np.array(y_20))
+
+ax2.plot(x_smooth, err_10, 'g--', label="Похибка (21-10)")
+ax2.plot(x_smooth, err_15, 'm-.', label="Похибка (21-15)")
+ax2.plot(x_smooth, err_20, 'b-', label="Похибка (21-20)")
+
+ax2.set_title("Абсолютна похибка відносно 21-вузлового сплайну")
+ax2.set_xlabel("Кумулятивна відстань (м)")
+ax2.set_ylabel("Похибка (м)")
+ax2.legend()
+ax2.grid(True)
+
+plt.tight_layout()
 plt.savefig("goverla_comparison.png", dpi=300, bbox_inches='tight')
-print("\n графік збережено у 'goverla_comparison.png'")
+print("\n графік збережено")
 
 print("\n--- ХАРАКТЕРИСТИКИ МАРШРУТУ ---")
 
