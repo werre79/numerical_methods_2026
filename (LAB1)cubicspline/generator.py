@@ -1,3 +1,8 @@
+"""
+Laboratory Work #1: Cubic Spline Interpolation for Altitude Profile Analysis.
+This script fetches GPS data, computes cubic splines with different node counts,
+and visualizes the results along with interpolation errors.
+"""
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
@@ -101,21 +106,56 @@ def build_spline(x_nodes, y_nodes, print_coeffs=False):
 
 x_smooth, y_smooth = build_spline(distances, elevations, print_coeffs=True)
 
-#Побудова графіків
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), gridspec_kw={'height_ratios': [2, 1]})
-
+# Побудова графіків
+# 1. Побудова окремого графіка профілю
+plt.figure(figsize=(12, 7))
 idx_10 = np.linspace(0, n - 1, 10, dtype=int)
 x_10, y_10 = build_spline([distances[i] for i in idx_10], [elevations[i] for i in idx_10])
-ax1.plot(x_10, y_10, 'g--', label="Сплайн (10 вузлів)")
+plt.plot(x_10, y_10, 'g--', label="Сплайн (10 вузлів)")
 
 idx_15 = np.linspace(0, n - 1, 15, dtype=int)
 x_15, y_15 = build_spline([distances[i] for i in idx_15], [elevations[i] for i in idx_15])
-ax1.plot(x_15, y_15, 'm-.', label="Сплайн (15 вузлів)")
+plt.plot(x_15, y_15, 'm-.', label="Сплайн (15 вузлів)")
 
 idx_20 = np.linspace(0, n - 1, 20, dtype=int)
 x_20, y_20 = build_spline([distances[i] for i in idx_20], [elevations[i] for i in idx_20])
-ax1.plot(x_20, y_20, 'b-', label="Сплайн (20 вузлів)")
+plt.plot(x_20, y_20, 'b-', label="Сплайн (20 вузлів)")
 
+plt.plot(x_smooth, y_smooth, 'k:', label="Сплайн (21 вузол - ідеальний)", linewidth=2, alpha=0.5)
+plt.plot(distances, elevations, 'ro', label="Реальні GPS вузли")
+
+plt.title("Профіль висоти: порівняння точності сплайнів")
+plt.xlabel("Кумулятивна відстань (м)")
+plt.ylabel("Висота (м)")
+plt.legend()
+plt.grid(True)
+plt.savefig("goverla_profile.png", dpi=300, bbox_inches='tight')
+plt.close()
+
+# 2. Побудова окремого графіка похибок
+err_10 = np.abs(np.array(y_smooth) - np.array(y_10))
+err_15 = np.abs(np.array(y_smooth) - np.array(y_15))
+err_20 = np.abs(np.array(y_smooth) - np.array(y_20))
+
+plt.figure(figsize=(12, 5))
+plt.plot(x_smooth, err_10, 'g--', label="Похибка (21-10 вузлів)")
+plt.plot(x_smooth, err_15, 'm-.', label="Похибка (21-15 вузлів)")
+plt.plot(x_smooth, err_20, 'b-', label="Похибка (21-20 вузлів)")
+
+plt.title("Абсолютна похибка відносно 21-вузлового сплайну")
+plt.xlabel("Кумулятивна відстань (м)")
+plt.ylabel("Похибка (м)")
+plt.legend()
+plt.grid(True)
+plt.savefig("goverla_errors.png", dpi=300, bbox_inches='tight')
+plt.close()
+
+# 3. Побудова комбінованого графіка (для зручності перегляду)
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), gridspec_kw={'height_ratios': [2, 1]})
+
+ax1.plot(x_10, y_10, 'g--', label="Сплайн (10 вузлів)")
+ax1.plot(x_15, y_15, 'm-.', label="Сплайн (15 вузлів)")
+ax1.plot(x_20, y_20, 'b-', label="Сплайн (20 вузлів)")
 ax1.plot(x_smooth, y_smooth, 'k:', label="Сплайн (21 вузол - ідеальний)", linewidth=2, alpha=0.5)
 ax1.plot(distances, elevations, 'ro', label="Реальні GPS вузли")
 
@@ -123,11 +163,6 @@ ax1.set_title("Профіль висоти: порівняння точност�
 ax1.set_ylabel("Висота (м)")
 ax1.legend()
 ax1.grid(True)
-
-# Графік похибок
-err_10 = np.abs(np.array(y_smooth) - np.array(y_10))
-err_15 = np.abs(np.array(y_smooth) - np.array(y_15))
-err_20 = np.abs(np.array(y_smooth) - np.array(y_20))
 
 ax2.plot(x_smooth, err_10, 'g--', label="Похибка (21-10)")
 ax2.plot(x_smooth, err_15, 'm-.', label="Похибка (21-15)")
@@ -141,7 +176,7 @@ ax2.grid(True)
 
 plt.tight_layout()
 plt.savefig("goverla_comparison.png", dpi=300, bbox_inches='tight')
-print("\n графік збережено")
+print("\nГрафіки збережено (goverla_profile.png, goverla_errors.png, goverla_comparison.png)")
 
 print("\n--- ХАРАКТЕРИСТИКИ МАРШРУТУ ---")
 
