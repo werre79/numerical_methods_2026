@@ -65,16 +65,15 @@ def main():
         print("Похибка стала нульовою (або близькою до машинного нуля).")
         
     D_h_quarter = central_difference(M, t0, h_fixed / 4)
-    D_num = D_h_half * D_h_half - D_h * D_h_quarter
-    D_den = 2 * D_h_half - D_h - D_h_quarter
+    D_den = 2 * D_h_half - (D_h + D_h_quarter)
     
     if D_den != 0:
-        D_aitken = D_h_quarter - (D_h_quarter - D_h_half)**2 / (D_h_quarter - 2*D_h_half + D_h)
+        D_aitken = (D_h_half**2 - D_h * D_h_quarter) / D_den
         error_aitken = abs(D_aitken - exact_val)
         
-        ratio = (D_h_half - D_h) / (D_h_quarter - D_h_half)
+        ratio = abs((D_h - D_h_half) / (D_h_half - D_h_quarter))
         if ratio > 0:
-            p = np.log2(ratio)
+            p = (1 / np.log(2)) * np.log(ratio)
         else:
             p = float('nan')
             

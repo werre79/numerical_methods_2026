@@ -94,13 +94,13 @@ def main():
         print(f"Похибка зменшилася у {err_h / err_rr:.2f} разів")
         
     S_h_quarter = simpson_composite(f, a, b, N_base * 4)
-    den = S_h_quarter - 2 * S_h_half + S_h
+    den = 2 * S_h_half - (S_h + S_h_quarter)
     if den != 0:
-        S_aitken = S_h_quarter - (S_h_quarter - S_h_half)**2 / den
+        S_aitken = (S_h_half**2 - S_h * S_h_quarter) / den
         err_aitken = abs(S_aitken - exact_val)
         
-        ratio = (S_h_half - S_h) / (S_h_quarter - S_h_half)
-        p = np.log2(ratio) if ratio > 0 else float('nan')
+        ratio = abs((S_h - S_h_half) / (S_h_half - S_h_quarter))
+        p = (1 / np.log(2)) * np.log(ratio) if ratio > 0 else float('nan')
         
         print("\nМетод Ейткена:")
         print(f"Уточнене значення: {S_aitken:.14f}")

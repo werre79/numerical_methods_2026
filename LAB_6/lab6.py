@@ -1,7 +1,4 @@
 import numpy as np
-import random
-import os
-
 def generate_and_save_data(n=100, x_val=2.5, a_filename="matrix_A.txt", b_filename="vector_B.txt"):
     A = np.random.rand(n, n) * 10
     
