@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def read_data(filename):
-    """Зчитує дані (X та Y) з CSV файлу."""
+    """"""
     x = []
     y = []
     with open(filename, 'r', newline='') as file:
@@ -16,7 +16,7 @@ def read_data(filename):
             x.append(float(row[fieldnames[0]]))
             y.append(float(row[fieldnames[1]]))
     return np.array(x), np.array(y)
-# -------------------------------------------------------------------
+
 def divided_diff_table(x, y):
     """"""
     n = len(y)
@@ -35,7 +35,6 @@ def newton_poly_div(coef, x_data, x):
         p = coef[0][n-k] + (x - x_data[n-k])*p
     return p
 
-# -------------------------------------------------------------------
 def finite_diff_table(y):
     """"""
     n = len(y)
@@ -56,7 +55,6 @@ def factorial_poly(diffs, y_data, q):
         p += diffs[0][k] * q_term
     return p
 
-# -------------------------------------------------------------------
 def lagrange_poly(x_data, y_data, x):
     """"""
     total = 0
@@ -69,7 +67,6 @@ def lagrange_poly(x_data, y_data, x):
         total += term
     return total
 
-# -------------------------------------------------------------------
 def test_function_1(x):
     return np.sin(x)
 
@@ -148,7 +145,6 @@ def research_part():
     val_lagrange = lagrange_poly(x_nodes, y_nodes, test_pt)
     print(f"   Т. {test_pt}: Ньютон={val_newton:.6f}, Лагранж={val_lagrange:.6f}, Точне={np.sin(test_pt):.6f}")
 
-# -------------------------------------------------------------------
 def run_variant_5():
     csv_file = "data_var5.csv"
     predict_x = 1000

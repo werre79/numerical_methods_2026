@@ -129,7 +129,7 @@ def main():
     error = [yt - ya for yt, ya in zip(y, y_approx_opt)]
     print("\nПохибки апроксимації для оптимального степеня (m={}):".format(optimal_m))
     for xi, err in zip(x, error):
-        print(f"x={xi:>2}, error={err:>8.4f}")
+        print(f"x={xi:>2}, error={abs(err):>8.4f}")
         
     # 7. Plots
     plt.figure(figsize=(12, 6))
@@ -152,7 +152,7 @@ def main():
     
     # Error
     plt.subplot(1, 2, 2)
-    plt.plot(x, error, 'o-', color='red', label='Похибка')
+    plt.plot(x, [abs(e) for e in error], 'o-', color='red', label='Похибка')
     plt.axhline(0, color='black', linestyle='--', linewidth=1)
     plt.title('Похибка апроксимації')
     plt.xlabel('Місяць')
