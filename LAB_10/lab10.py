@@ -49,34 +49,27 @@ def adams_pc_auto_step(a, b, y0, h0, eps):
     
     h = h0
     x = a
-    y = y0
     
-    # We need a previous point to start Adams. We'll use RK4 to get it.
-    y_prev = y
-    x_prev = x
-    
-    # Take a tiny step to initialize if needed, but it's better to maintain state.
-    # For simplicity of auto step, we'll re-init the previous point when h changes.
-    x += h
-    y = rk4_step(x_prev, y_prev, h)
-    xs.append(x)
-    ys.append(y)
-    hs.append(h)
+    need_restart = True
     
     while x < b:
         if x + h > b:
             h = b - x
-            # re-init previous point
-            y_prev = ys[-2]
-            x_prev = xs[-2]
-            # Since h changed, we really should recalculate y_prev at x-h, 
-            # but for the very last step, this approximation is okay or we can just use RK4
-            y = rk4_step(xs[-1], ys[-1], h)
-            xs.append(x + h)
-            ys.append(y)
-            hs.append(h)
-            break
+            need_restart = True
             
+        if need_restart:
+            # When changing step size, we use RK4 to take the first step 
+            # and establish a reliable backward point for the next Adams iteration
+            y_next = rk4_step(xs[-1], ys[-1], h)
+            xs.append(x + h)
+            ys.append(y_next)
+            hs.append(h)
+            x += h
+            need_restart = False
+            if x >= b: break
+            continue
+            
+        # Normal Adams Predictor-Corrector step
         fn = f(xs[-1], ys[-1])
         fn_minus_1 = f(xs[-2], ys[-2])
         
@@ -89,25 +82,18 @@ def adams_pc_auto_step(a, b, y0, h0, eps):
         
         if err > eps:
             h /= 2
-            # Recompute the previous point with the new h
-            # We discard the current step
-            x_prev = xs[-1] - h
-            y_prev = y_exact(x_prev) # Cheating slightly for initialization, or use RK backward
-            # Actually, standard way is to restart with RK4
-            y_new = rk4_step(xs[-1], ys[-1], h)
-            xs.append(xs[-1] + h)
-            ys.append(y_new)
-            hs.append(h)
-            x = xs[-1]
-            continue
+            need_restart = True
+            continue # Retry from current x with halved step
             
+        # Accept step
         xs.append(x + h)
         ys.append(yc)
         hs.append(h)
         x += h
         
-        if err < eps / 4: # Typical threshold to increase step
+        if err < eps / 4: 
             h *= 2
+            need_restart = True
             
     return np.array(xs), np.array(ys), np.array(hs)
 
